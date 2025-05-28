@@ -1,0 +1,61 @@
+
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <title>Trace & Color App</title>
+  <style>
+    body { margin: 0; background: #eee; text-align: center; font-family: sans-serif; }
+    canvas { border: 1px solid #ccc; background-image: url('line_art.png'); background-size: contain; background-repeat: no-repeat; background-position: center; }
+    .controls { margin: 10px; }
+  </style>
+</head>
+<body>
+  <h2>Trace and Color</h2>
+  <div class="controls">
+    <label>Brush color: <input type="color" id="colorPicker" value="#ff0000"></label>
+    <label>Brush size: <input type="range" id="brushSize" min="1" max="20" value="5"></label>
+    <button onclick="clearCanvas()">Clear</button>
+  </div>
+  <canvas id="paintCanvas" width="600" height="900"></canvas>
+
+  <script>
+    const canvas = document.getElementById('paintCanvas');
+    const ctx = canvas.getContext('2d');
+    let painting = false;
+
+    function startPosition(e) {
+      painting = true;
+      draw(e);
+    }
+
+    function endPosition() {
+      painting = false;
+      ctx.beginPath();
+    }
+
+    function draw(e) {
+      if (!painting) return;
+
+      const rect = canvas.getBoundingClientRect();
+      ctx.lineWidth = document.getElementById('brushSize').value;
+      ctx.lineCap = 'round';
+      ctx.strokeStyle = document.getElementById('colorPicker').value;
+
+      ctx.lineTo(e.clientX - rect.left, e.clientY - rect.top);
+      ctx.stroke();
+      ctx.beginPath();
+      ctx.moveTo(e.clientX - rect.left, e.clientY - rect.top);
+    }
+
+    function clearCanvas() {
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+    }
+
+    canvas.addEventListener('mousedown', startPosition);
+    canvas.addEventListener('mouseup', endPosition);
+    canvas.addEventListener('mousemove', draw);
+    canvas.addEventListener('mouseout', endPosition);
+  </script>
+</body>
+</html>
